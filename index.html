@@ -326,19 +326,55 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0b1020;font-family:
     </div>
   </a>
 
-  <!-- Coming soon x2 -->
-  <div class="island soon" style="left:21%;top:80%">
+  <!-- Politicana (live) — frozen yacht in arctic ice -->
+  <a class="island live active" id="isle-politicana" href="https://adamdegoat.github.io/politicana/" style="left:21%;top:80%">
     <div class="shadow"></div>
     <div class="reflect"></div>
-    <div class="ripple" style="opacity:.5"></div>
-    <div class="fog"></div>
-    <div class="art"><svg width="120" height="92" viewBox="0 0 120 92">
-      <ellipse cx="60" cy="74" rx="52" ry="15" fill="#1f2d44" opacity=".7"/>
-      <path d="M22 74 Q60 30 98 74 Z" fill="#16233a"/>
+    <div class="ripple"></div>
+    <div class="art"><svg width="164" height="118" viewBox="0 0 164 118">
+      <!-- aurora ribbon -->
+      <g class="aurora" fill="none" stroke-width="3" stroke-linecap="round" opacity=".55">
+        <path d="M30 30 Q72 14 112 28 Q134 36 146 26" stroke="#4ade80"/>
+        <path d="M34 40 Q78 26 120 38" stroke="#a5b4fc" opacity=".8"/>
+      </g>
+      <!-- frozen sea + ice shelf -->
+      <ellipse cx="82" cy="98" rx="76" ry="20" fill="#1e3a5f"/>
+      <ellipse cx="82" cy="93" rx="66" ry="15" fill="#7dd3fc" opacity=".85"/>
+      <ellipse cx="82" cy="90" rx="52" ry="11" fill="#e0f2fe"/>
+      <!-- pressure-ice mounds -->
+      <path d="M30 92 L46 72 L62 92 Z" fill="#bae6fd"/>
+      <path d="M104 92 L120 70 L138 92 Z" fill="#cfeafe"/>
+      <!-- the yacht, tilted in the ice -->
+      <g transform="rotate(-7 82 76)">
+        <!-- hull -->
+        <path d="M50 80 L118 80 L110 92 L58 92 Z" fill="#334155"/>
+        <rect x="54" y="74" width="58" height="8" fill="#475569"/>
+        <!-- superstructure -->
+        <rect x="64" y="58" width="38" height="18" rx="2" fill="#e2e8f0"/>
+        <rect x="70" y="46" width="24" height="14" rx="2" fill="#f1f5f9"/>
+        <!-- lit windows (warm gold glow) -->
+        <rect x="68" y="63" width="6" height="6" rx="1" fill="#fde68a"/>
+        <rect x="78" y="63" width="6" height="6" rx="1" fill="#fbbf24"/>
+        <rect x="88" y="63" width="6" height="6" rx="1" fill="#fde68a"/>
+        <rect x="74" y="50" width="6" height="6" rx="1" fill="#fbbf24"/>
+        <rect x="84" y="50" width="6" height="6" rx="1" fill="#fde68a"/>
+        <!-- funnel + steam -->
+        <rect x="96" y="40" width="8" height="12" rx="1.5" fill="#64748b"/>
+        <path class="smoke" d="M100 40 Q97 33 100 26" stroke="rgba(226,232,240,.6)" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+        <!-- warm cabin spill on the ice -->
+        <ellipse cx="83" cy="80" rx="20" ry="4" fill="#fbbf24" opacity=".25"/>
+      </g>
     </svg><div class="rim"></div></div>
-    <div class="qmark">?</div>
-    <div class="label">Coming soon</div>
-  </div>
+    <div class="label">Politicana</div>
+    <div class="cast-peek" id="poli-cast"></div>
+    <div class="isle-card">
+      <div class="ic-name">Politicana</div>
+      <div class="ic-status" id="poli-status"><span class="ic-dot"></span><span>Loading…</span></div>
+      <div class="ic-next" id="poli-next"><span class="tick"></span><span>next chapter soon</span></div>
+      <div class="ic-pulse" id="poli-pulse">Five rivals stranded on a yacht frozen in arctic ice.</div>
+      <div class="ic-go">Board the yacht ›</div>
+    </div>
+  </a>
 
   <div class="island soon" style="left:79%;top:83%">
     <div class="shadow"></div>
@@ -396,52 +432,52 @@ function nextChapter(){
   const d=next-mins, h=Math.floor(d/60), m=d%60;
   return h>0?`${h}h ${m}m`:`${m}m`;
 }
-function updateNext(){ const el=document.getElementById('trop-next'); if(el) el.querySelector('span:last-child').textContent='next chapter in '+nextChapter(); }
+function updateNext(){
+  const t='next chapter in '+nextChapter();
+  document.querySelectorAll('.ic-next span:last-child').forEach(el=>el.textContent=t);
+}
 updateNext(); setInterval(updateNext,30000);
 
-// ── live status + happening-now + chronicle, driven by the island manifest ──
-// islands.json is the registry of worlds. The live island's data URL + the count
-// of living worlds come from it; on any failure we fall back to Tropicana so
-// behaviour is identical to the hardcoded version.
+// ── live status driven by the islands.json registry; each live island wires its own card ──
 const CYIDX={morning:0,midday:1,evening:2,night:3};
-const TROP_DATA='https://adamdegoat.github.io/loveisland/data';
-function wireLive(dataBase,liveCount){
-  fetch(dataBase+'/world.json?t='+Date.now()).then(r=>r.json()).then(w=>{
+const CARD={tropicana:'trop', politicana:'poli'};   // island id -> card id prefix
+function wireIsland(isl, isPrimary){
+  const pre=CARD[isl.id]; if(!pre || !isl.data) return Promise.resolve(0);
+  const setStatus=(html)=>{ const e=document.getElementById(pre+'-status'); if(e) e.innerHTML=html; };
+  const p=fetch(isl.data+'/world.json?t='+Date.now()).then(r=>r.json()).then(w=>{
     const wx=WX[(w.weather||'clear').toLowerCase()]||'☀️ Clear';
-    document.getElementById('trop-status').innerHTML=`<span class="ic-dot"></span><span>Day ${w.day||1} · ${CY[w.cycle]||''} · ${wx}</span>`;
-    if(w.pulse){ document.getElementById('trop-pulse').textContent=w.pulse; document.getElementById('happening-text').textContent=w.pulse; }
-    const chapters=(Math.max(1,w.day||1)-1)*4 + ((CYIDX[w.cycle]!=null)?CYIDX[w.cycle]:0) + 1;
-    document.getElementById('chronicle').textContent=`${liveCount} living world${liveCount>1?'s':''} · ${chapters} chapters lived · and counting`;
-  }).catch(()=>{
-    document.getElementById('trop-status').innerHTML=`<span class="ic-dot"></span><span>Live · always running</span>`;
-  });
-
-  // ── cast peek: the inhabitants, in their real colours ──
-  fetch(dataBase+'/characters.json?t='+Date.now()).then(r=>r.json()).then(chars=>{
+    setStatus(`<span class="ic-dot"></span><span>Day ${w.day||1} · ${CY[w.cycle]||''} · ${wx}</span>`);
+    const pulseEl=document.getElementById(pre+'-pulse'); if(w.pulse && pulseEl) pulseEl.textContent=w.pulse;
+    if(isPrimary && w.pulse){ const h=document.getElementById('happening-text'); if(h) h.textContent=w.pulse; }
+    return (Math.max(1,w.day||1)-1)*4 + ((CYIDX[w.cycle]!=null)?CYIDX[w.cycle]:0) + 1;
+  }).catch(()=>{ setStatus(`<span class="ic-dot"></span><span>Live · always running</span>`); return 0; });
+  fetch(isl.data+'/characters.json?t='+Date.now()).then(r=>r.json()).then(chars=>{
     let html='';
     Object.values(chars).forEach(c=>{
       if(!c || typeof c!=='object') return;
       if(c.species==='dog') html+=`<span class="cast-dog" title="stray">🐾</span>`;
       else if(c.name && c.name.trim()) html+=`<span class="cast-dot" style="background:${c.color||'#fde68a'}" title="${c.name}"></span>`;
     });
-    const el=document.getElementById('trop-cast'); if(el && html) el.innerHTML=html;
+    const el=document.getElementById(pre+'-cast'); if(el && html) el.innerHTML=html;
   }).catch(()=>{});
+  return p;
 }
 fetch('islands.json?t='+Date.now()).then(r=>r.json()).then(m=>{
-  const islands=m.islands||[];
-  const live=islands.filter(i=>i.status==='live');
-  const primary=live.find(i=>i.data)||{};
-  wireLive(primary.data||TROP_DATA, live.length||1);
-}).catch(()=>wireLive(TROP_DATA,1));
+  const live=(m.islands||[]).filter(i=>i.status==='live');
+  Promise.all(live.map((isl,i)=>wireIsland(isl, i===0))).then(chaps=>{
+    const total=chaps.reduce((a,b)=>a+(b||0),0);
+    const el=document.getElementById('chronicle');
+    if(el) el.textContent=`${live.length} living world${live.length>1?'s':''} · ${total} chapters lived · and counting`;
+  });
+}).catch(()=>{});
 
-// ── mobile: tap toggles the card before navigating ──
-const trop=document.getElementById('isle-tropicana');
+// ── mobile: tap toggles a live island's card before navigating ──
 const isTouch=window.matchMedia('(hover:none)').matches;
 if(isTouch){
-  trop.addEventListener('click',e=>{
-    if(!trop.classList.contains('card-open')){ e.preventDefault(); trop.classList.add('card-open'); }
+  document.querySelectorAll('.island.live').forEach(isle=>{
+    isle.addEventListener('click',e=>{ if(!isle.classList.contains('card-open')){ e.preventDefault(); isle.classList.add('card-open'); } });
   });
-  document.addEventListener('click',e=>{ if(!trop.contains(e.target)) trop.classList.remove('card-open'); });
+  document.addEventListener('click',e=>{ document.querySelectorAll('.island.live.card-open').forEach(isle=>{ if(!isle.contains(e.target)) isle.classList.remove('card-open'); }); });
 }
 </script>
 </body>

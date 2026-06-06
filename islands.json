@@ -12,13 +12,13 @@
       "pos": { "left": "50%", "top": "70%" }
     },
     {
-      "id": "world02",
+      "id": "politicana",
       "world_no": 2,
-      "name": "Coming soon",
-      "status": "soon",
-      "url": null,
-      "data": null,
-      "blurb": null,
+      "name": "Politicana",
+      "status": "live",
+      "url": "https://adamdegoat.github.io/politicana/",
+      "data": "https://adamdegoat.github.io/politicana/data",
+      "blurb": "Five rivals stranded on a yacht frozen in arctic ice.",
       "pos": { "left": "21%", "top": "80%" }
     },
     {
