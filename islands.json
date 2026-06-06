@@ -1,0 +1,35 @@
+{
+  "_comment": "Registry of Never Ending Story worlds. To light up a new world: flip its status to 'live', set url + data, then hand-craft its island SVG art in index.html to the aesthetic bar. Bespoke art stays hand-built — only the wiring/metadata lives here.",
+  "islands": [
+    {
+      "id": "tropicana",
+      "world_no": 1,
+      "name": "Tropicana",
+      "status": "live",
+      "url": "https://adamdegoat.github.io/loveisland/",
+      "data": "https://adamdegoat.github.io/loveisland/data",
+      "blurb": "A deserted island where castaways find each other.",
+      "pos": { "left": "50%", "top": "70%" }
+    },
+    {
+      "id": "world02",
+      "world_no": 2,
+      "name": "Coming soon",
+      "status": "soon",
+      "url": null,
+      "data": null,
+      "blurb": null,
+      "pos": { "left": "21%", "top": "80%" }
+    },
+    {
+      "id": "world03",
+      "world_no": 3,
+      "name": "Coming soon",
+      "status": "soon",
+      "url": null,
+      "data": null,
+      "blurb": null,
+      "pos": { "left": "79%", "top": "83%" }
+    }
+  ]
+}

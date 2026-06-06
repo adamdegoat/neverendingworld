@@ -399,28 +399,40 @@ function nextChapter(){
 function updateNext(){ const el=document.getElementById('trop-next'); if(el) el.querySelector('span:last-child').textContent='next chapter in '+nextChapter(); }
 updateNext(); setInterval(updateNext,30000);
 
-// ── live status + happening-now + chronicle, from Tropicana's published data ──
+// ── live status + happening-now + chronicle, driven by the island manifest ──
+// islands.json is the registry of worlds. The live island's data URL + the count
+// of living worlds come from it; on any failure we fall back to Tropicana so
+// behaviour is identical to the hardcoded version.
 const CYIDX={morning:0,midday:1,evening:2,night:3};
-fetch('https://adamdegoat.github.io/loveisland/data/world.json?t='+Date.now()).then(r=>r.json()).then(w=>{
-  const wx=WX[(w.weather||'clear').toLowerCase()]||'☀️ Clear';
-  document.getElementById('trop-status').innerHTML=`<span class="ic-dot"></span><span>Day ${w.day||1} · ${CY[w.cycle]||''} · ${wx}</span>`;
-  if(w.pulse){ document.getElementById('trop-pulse').textContent=w.pulse; document.getElementById('happening-text').textContent=w.pulse; }
-  const chapters=(Math.max(1,w.day||1)-1)*4 + ((CYIDX[w.cycle]!=null)?CYIDX[w.cycle]:0) + 1;
-  document.getElementById('chronicle').textContent=`1 living world · ${chapters} chapters lived · and counting`;
-}).catch(()=>{
-  document.getElementById('trop-status').innerHTML=`<span class="ic-dot"></span><span>Live · always running</span>`;
-});
-
-// ── cast peek: the inhabitants, in their real colours ──
-fetch('https://adamdegoat.github.io/loveisland/data/characters.json?t='+Date.now()).then(r=>r.json()).then(chars=>{
-  let html='';
-  Object.values(chars).forEach(c=>{
-    if(!c || typeof c!=='object') return;
-    if(c.species==='dog') html+=`<span class="cast-dog" title="stray">🐾</span>`;
-    else if(c.name && c.name.trim()) html+=`<span class="cast-dot" style="background:${c.color||'#fde68a'}" title="${c.name}"></span>`;
+const TROP_DATA='https://adamdegoat.github.io/loveisland/data';
+function wireLive(dataBase,liveCount){
+  fetch(dataBase+'/world.json?t='+Date.now()).then(r=>r.json()).then(w=>{
+    const wx=WX[(w.weather||'clear').toLowerCase()]||'☀️ Clear';
+    document.getElementById('trop-status').innerHTML=`<span class="ic-dot"></span><span>Day ${w.day||1} · ${CY[w.cycle]||''} · ${wx}</span>`;
+    if(w.pulse){ document.getElementById('trop-pulse').textContent=w.pulse; document.getElementById('happening-text').textContent=w.pulse; }
+    const chapters=(Math.max(1,w.day||1)-1)*4 + ((CYIDX[w.cycle]!=null)?CYIDX[w.cycle]:0) + 1;
+    document.getElementById('chronicle').textContent=`${liveCount} living world${liveCount>1?'s':''} · ${chapters} chapters lived · and counting`;
+  }).catch(()=>{
+    document.getElementById('trop-status').innerHTML=`<span class="ic-dot"></span><span>Live · always running</span>`;
   });
-  const el=document.getElementById('trop-cast'); if(el && html) el.innerHTML=html;
-}).catch(()=>{});
+
+  // ── cast peek: the inhabitants, in their real colours ──
+  fetch(dataBase+'/characters.json?t='+Date.now()).then(r=>r.json()).then(chars=>{
+    let html='';
+    Object.values(chars).forEach(c=>{
+      if(!c || typeof c!=='object') return;
+      if(c.species==='dog') html+=`<span class="cast-dog" title="stray">🐾</span>`;
+      else if(c.name && c.name.trim()) html+=`<span class="cast-dot" style="background:${c.color||'#fde68a'}" title="${c.name}"></span>`;
+    });
+    const el=document.getElementById('trop-cast'); if(el && html) el.innerHTML=html;
+  }).catch(()=>{});
+}
+fetch('islands.json?t='+Date.now()).then(r=>r.json()).then(m=>{
+  const islands=m.islands||[];
+  const live=islands.filter(i=>i.status==='live');
+  const primary=live.find(i=>i.data)||{};
+  wireLive(primary.data||TROP_DATA, live.length||1);
+}).catch(()=>wireLive(TROP_DATA,1));
 
 // ── mobile: tap toggles the card before navigating ──
 const trop=document.getElementById('isle-tropicana');
