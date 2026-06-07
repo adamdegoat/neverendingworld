@@ -402,7 +402,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0b1020;font-family:
   <div id="grain"></div>
   <div id="vignette"></div>
   <div id="footer">
-    <div id="happening"><b>Right now on Tropicana</b> &nbsp;·&nbsp; <span id="happening-text">the island stirs…</span></div>
+    <div id="happening"><b id="happening-where">Right now on Tropicana</b> &nbsp;·&nbsp; <span id="happening-text">the island stirs…</span></div>
     <div id="chronicle">A living world · always running</div>
   </div>
 </div>
@@ -438,6 +438,17 @@ function updateNext(){
 }
 updateNext(); setInterval(updateNext,30000);
 
+// ── highlights bar rotates through every live island's pulse ──
+const HAPPENINGS=[]; let hapIdx=0;
+function renderHappening(){
+  if(!HAPPENINGS.length) return;
+  const cur=HAPPENINGS[hapIdx % HAPPENINGS.length];
+  const w=document.getElementById('happening-where'); const t=document.getElementById('happening-text');
+  if(w) w.textContent='Right now on '+cur.where;
+  if(t) t.textContent=cur.pulse;
+}
+setInterval(()=>{ if(HAPPENINGS.length>1){ hapIdx=(hapIdx+1)%HAPPENINGS.length; renderHappening(); } },6000);
+
 // ── live status driven by the islands.json registry; each live island wires its own card ──
 const CYIDX={morning:0,midday:1,evening:2,night:3};
 const CARD={tropicana:'trop', politicana:'poli'};   // island id -> card id prefix
@@ -448,7 +459,7 @@ function wireIsland(isl, isPrimary){
     const wx=WX[(w.weather||'clear').toLowerCase()]||'☀️ Clear';
     setStatus(`<span class="ic-dot"></span><span>Day ${w.day||1} · ${CY[w.cycle]||''} · ${wx}</span>`);
     const pulseEl=document.getElementById(pre+'-pulse'); if(w.pulse && pulseEl) pulseEl.textContent=w.pulse;
-    if(isPrimary && w.pulse){ const h=document.getElementById('happening-text'); if(h) h.textContent=w.pulse; }
+    if(w.pulse){ HAPPENINGS.push({where: isl.name || (isl.id.charAt(0).toUpperCase()+isl.id.slice(1)), pulse: w.pulse}); renderHappening(); }
     return (Math.max(1,w.day||1)-1)*4 + ((CYIDX[w.cycle]!=null)?CYIDX[w.cycle]:0) + 1;
   }).catch(()=>{ setStatus(`<span class="ic-dot"></span><span>Live · always running</span>`); return 0; });
   fetch(isl.data+'/characters.json?t='+Date.now()).then(r=>r.json()).then(chars=>{
