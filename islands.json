@@ -12,13 +12,23 @@
       "pos": { "left": "50%", "top": "70%" }
     },
     {
-      "id": "world03",
-      "world_no": 3,
+      "id": "world02",
+      "world_no": 2,
       "name": "Coming soon",
       "status": "soon",
       "url": null,
       "data": null,
       "blurb": null,
+      "pos": { "left": "21%", "top": "80%" }
+    },
+    {
+      "id": "rimba",
+      "world_no": 3,
+      "name": "Rimba",
+      "status": "live",
+      "url": "https://adamdegoat.github.io/rimba/",
+      "data": "https://adamdegoat.github.io/rimba/data",
+      "blurb": "Two Singaporeans & a cat, stranded deep in the Malaysian jungle.",
       "pos": { "left": "79%", "top": "83%" }
     }
   ]
