@@ -229,12 +229,70 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0b1020;font-family:
   #happening{font-size:10.5px;max-width:92vw}
   #chronicle{font-size:8.5px;letter-spacing:.16em}
 }
+
+/* ════ LIVING ISLANDS — each island mirrors its world's real state ════ */
+/* per-world weather (class set from the live world.json) */
+.island .wx-layer{position:absolute;inset:0;border-radius:50%;overflow:hidden;pointer-events:none;z-index:4;opacity:0;transition:opacity .9s ease;background:transparent}
+.island.wx-rain .wx-layer{opacity:1;background:rgba(28,42,58,.18)}
+.island.wx-storm .wx-layer{opacity:1;background:rgba(16,26,40,.34)}
+.island.wx-clear .wx-layer{opacity:1;background:radial-gradient(120% 120% at 78% 18%,rgba(255,226,150,.14),transparent 56%)}
+.island .wx-layer::before{content:'';position:absolute;inset:-30%;opacity:0;transition:opacity .9s ease;
+  background-image:repeating-linear-gradient(108deg,rgba(206,226,240,.55) 0 1px,transparent 1px 7px);animation:hubRain .6s linear infinite}
+.island.wx-rain .wx-layer::before{opacity:.5}
+.island.wx-storm .wx-layer::before{opacity:.78;animation-duration:.36s}
+@keyframes hubRain{from{transform:translate(0,0)}to{transform:translate(-7px,14px)}}
+/* night embers: campfire glows brighten + pulse after dark; lit windows */
+.isle-ember{transition:opacity 1s ease}
+#world.night .isle-ember{animation:emberPulse 3.2s ease-in-out infinite}
+@keyframes emberPulse{0%,100%{opacity:.55}50%{opacity:.95}}
+.isle-window{opacity:0;transition:opacity 1s ease}
+#world.night .isle-window{opacity:1;animation:emberPulse 4s ease-in-out infinite}
+/* gentle island bob on the swell (svg only → hover-scale on .art still works) */
+@keyframes isleBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.island.live .art svg{animation:isleBob 6s ease-in-out infinite}
+#isle-rimba .art svg{animation-delay:-3s;animation-duration:6.8s}
+/* cast peek → mini character figures */
+.cast-peek{height:18px;gap:3px}
+.cast-fig{display:block;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5))}
+/* parallax layer smoothing handled in JS (no transform transition to avoid conflicts) */
+#islands-layer{position:absolute;inset:0;will-change:transform}
+
+/* shooting star (night only) */
+#shooting{position:absolute;top:14%;left:62%;width:2.4px;height:2.4px;border-radius:50%;background:#fff;
+  box-shadow:0 0 6px #fff,0 0 12px rgba(255,255,255,.5);z-index:1;opacity:0;pointer-events:none}
+#shooting::before{content:'';position:absolute;right:1px;top:50%;width:46px;height:1.5px;transform:translateY(-50%);
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.9));border-radius:2px}
+#world.night #shooting{animation:shoot 11s ease-in infinite}
+@keyframes shoot{0%,80%{opacity:0;transform:translate(0,0)}82%{opacity:1}90%{opacity:1;transform:translate(-180px,104px)}93%,100%{opacity:0;transform:translate(-180px,104px)}}
+
+/* first-visit intro overlay */
+#intro{position:fixed;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;padding:24px;
+  background:radial-gradient(120% 100% at 50% 40%,rgba(6,10,26,.6),rgba(2,4,14,.85));
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);opacity:0;animation:introIn 1s ease .2s forwards}
+#intro.closing{animation:introOut .6s ease forwards}
+@keyframes introIn{to{opacity:1}}
+@keyframes introOut{to{opacity:0;visibility:hidden}}
+#intro-card{max-width:430px;text-align:center;background:linear-gradient(160deg,rgba(14,12,34,.88),rgba(6,6,20,.84));
+  border:1px solid rgba(255,237,160,.22);border-radius:20px;padding:30px 28px 26px;opacity:0;
+  box-shadow:0 24px 70px rgba(0,0,0,.6),0 0 40px rgba(251,191,36,.06);transform:translateY(14px);animation:introCard 1s cubic-bezier(.2,.85,.25,1) .3s forwards}
+@keyframes introCard{to{transform:translateY(0);opacity:1}}
+#intro-card .ico{font-size:34px;margin-bottom:6px}
+#intro-card h2{font-family:'Cinzel',serif;font-weight:800;font-size:21px;letter-spacing:.04em;margin-bottom:12px;
+  background:linear-gradient(180deg,#fff8ea,#fde68a 55%,#f59e0b);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+#intro-card p{font-size:13.5px;line-height:1.6;color:rgba(255,255,255,.78);margin:0 auto}
+#intro-card p b{color:#fde68a;font-weight:600}
+#intro-card .hint{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:rgba(253,230,138,.7);margin:14px 0 18px}
+#intro-btn{font-family:'Cinzel',serif;font-weight:700;letter-spacing:.1em;font-size:13px;color:#0b1020;cursor:pointer;
+  background:linear-gradient(180deg,#fde68a,#f59e0b);border:none;border-radius:12px;padding:11px 26px;
+  box-shadow:0 8px 24px rgba(251,191,36,.28);transition:transform .15s ease,box-shadow .15s ease}
+#intro-btn:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(251,191,36,.4)}
 </style>
 </head>
 <body>
 <div id="world" class="day">
   <div id="sky-sea"></div>
   <div id="stars"></div>
+  <div id="shooting"></div>
   <div id="sun"><div id="moon-shadow"></div></div>
   <div id="horizon"></div>
   <div id="haze"></div>
@@ -277,7 +335,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0b1020;font-family:
     <div class="manifesto">Worlds that write themselves — no script, no crew, no end.</div>
   </div>
 
-  <!-- ISLANDS -->
+  <!-- ISLANDS (wrapped in a parallax layer) -->
+  <div id="islands-layer">
   <!-- Tropicana (live) -->
   <a class="island live active" id="isle-tropicana" href="https://adamdegoat.github.io/loveisland/" style="left:50%;top:70%">
     <div class="shadow"></div>
@@ -309,12 +368,13 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0b1020;font-family:
       <rect x="80" y="80" width="22" height="16" rx="2" fill="#9a6a3c"/>
       <path d="M76 80 L91 68 L106 80 Z" fill="#7a4a26"/>
       <rect x="87" y="86" width="8" height="10" fill="#5c3a22"/>
+      <rect class="isle-window" x="88" y="87" width="6" height="6" rx="1" fill="#ffd98a"/>
       <!-- campfire: glow + flame + smoke -->
-      <ellipse cx="66" cy="98" rx="9" ry="3.4" fill="#fb923c" opacity=".55"/>
+      <ellipse class="isle-ember" cx="66" cy="98" rx="9" ry="3.4" fill="#fb923c" opacity=".55"/>
       <path class="smoke" d="M66 92 Q63 86 66 80" stroke="rgba(220,220,220,.6)" stroke-width="2.4" fill="none" stroke-linecap="round"/>
       <path class="flame" d="M62 98 Q60 90 66 84 Q72 90 70 98 Z" fill="#f97316"/>
       <path class="flame" d="M64 98 Q63 92 66 88 Q69 92 68 98 Z" fill="#fde047"/>
-    </svg><div class="rim"></div></div>
+    </svg><div class="rim"></div><div class="wx-layer"></div></div>
     <div class="label">Tropicana</div>
     <div class="cast-peek" id="trop-cast"></div>
     <div class="isle-card">
@@ -365,15 +425,16 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0b1020;font-family:
         <rect x="86" y="82" width="15" height="7" rx="2" fill="#b9c0c7"/>
         <rect x="84" y="79.5" width="19" height="2.6" rx="1" fill="#33383d"/>
         <path d="M86 82 L100 82 L102 88 L84 88 Z" fill="#13241c" opacity=".7"/>
+        <rect class="isle-window" x="89" y="83" width="9" height="4" rx="1" fill="#ffd98a"/>
         <circle cx="86" cy="97" r="3.6" fill="#16191c"/><circle cx="101" cy="97" r="3.6" fill="#16191c"/>
         <circle cx="86" cy="97" r="1.5" fill="#c4cbd2"/><circle cx="101" cy="97" r="1.5" fill="#c4cbd2"/>
       </g>
       <!-- campfire: glow + flame + smoke -->
-      <ellipse cx="120" cy="99" rx="8" ry="3" fill="#fb923c" opacity=".55"/>
+      <ellipse class="isle-ember" cx="120" cy="99" rx="8" ry="3" fill="#fb923c" opacity=".55"/>
       <path class="smoke" d="M120 93 Q117 87 120 81" stroke="rgba(220,220,220,.55)" stroke-width="2.2" fill="none" stroke-linecap="round"/>
       <path class="flame" d="M116 99 Q114 91 120 85 Q126 91 124 99 Z" fill="#f97316"/>
       <path class="flame" d="M118 99 Q117 93 120 89 Q123 93 122 99 Z" fill="#fde047"/>
-    </svg><div class="rim"></div></div>
+    </svg><div class="rim"></div><div class="wx-layer"></div></div>
     <div class="label">Rimba</div>
     <div class="cast-peek" id="rimba-cast"></div>
     <div class="isle-card">
@@ -398,6 +459,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0b1020;font-family:
     <div class="qmark">?</div>
     <div class="label">Coming soon</div>
   </div>
+  </div><!-- /islands-layer -->
 
   <!-- compass -->
   <svg id="compass" width="64" height="64" viewBox="0 0 64 64">
@@ -417,6 +479,17 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0b1020;font-family:
   </div>
 </div>
 
+<!-- first-visit intro (shown once per device) -->
+<div id="intro">
+  <div id="intro-card">
+    <div class="ico">🌍</div>
+    <h2>The Never Ending World</h2>
+    <p>A living archipelago of <b>self-running story worlds</b>. The characters have memory, relationships and fate — they live, struggle, fall in love and surprise you, <b>four times a day, with no script</b>.</p>
+    <div class="hint">Tap an island to enter a world</div>
+    <button id="intro-btn">Explore →</button>
+  </div>
+</div>
+
 <script>
 // ── stars ──
 (function(){const s=document.getElementById('stars');let h='';for(let i=0;i<70;i++){const x=Math.random()*100,y=Math.random()*100,r=Math.random()*1.6+.5,d=(Math.random()*3).toFixed(2);h+=`<div class="star" style="left:${x}%;top:${y}%;width:${r}px;height:${r}px;animation-delay:${d}s"></div>`;}s.innerHTML=h;})();
@@ -433,6 +506,29 @@ applyTime(); setInterval(applyTime,5*60000);
 // ── live status from Tropicana (same-origin once deployed; fails gracefully) ──
 const WX={clear:'☀️ Clear',sunny:'☀️ Clear',hot:'🔥 Hot',rain:'🌧️ Rain',storm:'⛈️ Storm',overcast:'☁️ Overcast',cloudy:'☁️ Cloudy',foggy:'🌫️ Fog'};
 const CY={morning:'Morning',midday:'Midday',evening:'Evening',night:'Night'};
+// classify a world's weather string → an island weather class
+function weatherClass(w){const s=(w||'').toLowerCase();
+  if(/storm|thunder|gale|squall|cyclone|monsoon|deluge/.test(s)) return 'storm';
+  if(/rain|drizzle|shower|downpour|wet|drip|pour/.test(s)) return 'rain';
+  return 'clear';}
+// tiny character figure from a world's appearance data (head+shoulders, or a cat/dog)
+function miniAvatar(c){
+  const a=c.appearance||{};
+  const sp=c.species&&c.species!=='human'?c.species:null;
+  if(sp==='cat'){const coat=a.coat||c.color||'#d98a4a';
+    return `<svg class="cast-fig" width="15" height="15" viewBox="0 0 18 18"><path d="M3 6 L5 1 L7.6 5 Z M15 6 L13 1 L10.4 5 Z" fill="${coat}"/><circle cx="9" cy="9.4" r="6" fill="${coat}"/><circle cx="6.7" cy="9" r="1" fill="#1c1c1f"/><circle cx="11.3" cy="9" r="1" fill="#1c1c1f"/><path d="M9 10.8 l-2.4 1 M9 10.8 l2.4 1" stroke="#1c1c1f" stroke-width=".6"/></svg>`;}
+  if(sp) return `<span class="cast-dog" title="${c.name||'stray'}">🐾</span>`;
+  const skin=a.skin||c.color||'#e0b890', hair=(a.hair&&a.hair.color)||'#3a2418',
+        outfit=a.outfit||c.color||'#64748b', acc=a.accessory, accColor=a.accColor||outfit;
+  let extra='';
+  if(acc==='sunglasses') extra=`<rect x="4.6" y="7.4" width="8.8" height="2.1" rx="1" fill="#1c2024"/>`;
+  else if(acc==='cap'||acc==='beanie'||acc==='hood') extra=`<path d="M3.5 7.4 Q3 3 9 3 Q15 3 14.5 7.4 Z" fill="${accColor}"/>`;
+  else if(acc==='earrings') extra=`<circle cx="3.6" cy="9.6" r=".9" fill="#fde68a"/><circle cx="14.4" cy="9.6" r=".9" fill="#fde68a"/>`;
+  return `<svg class="cast-fig" width="15" height="17" viewBox="0 0 18 20">`
+    +`<path d="M2.5 20 Q2.5 13 9 13 Q15.5 13 15.5 20 Z" fill="${outfit}"/>`
+    +`<circle cx="9" cy="8.6" r="5.4" fill="${skin}"/>`
+    +`<path d="M3.6 8.6 Q3 2.4 9 2.4 Q15 2.4 14.4 8.6 Q14 4.6 9 4.6 Q4 4.6 3.6 8.6 Z" fill="${hair}"/>`
+    +extra+`</svg>`;}
 // ── next-chapter countdown (cycles at SGT 7:00, 12:30, 18:00, 23:00) ──
 function nextChapter(){
   const n=new Date(); const sgt=new Date(n.getTime()+n.getTimezoneOffset()*60000+8*3600000);
@@ -467,6 +563,9 @@ function wireIsland(isl, isPrimary){
   const setStatus=(html)=>{ const e=document.getElementById(pre+'-status'); if(e) e.innerHTML=html; };
   const p=fetch(isl.data+'/world.json?t='+Date.now()).then(r=>r.json()).then(w=>{
     const wx=WX[(w.weather||'clear').toLowerCase()]||'☀️ Clear';
+    // the island art mirrors its world's real weather
+    const isleEl=document.getElementById('isle-'+isl.id);
+    if(isleEl){ isleEl.classList.remove('wx-clear','wx-rain','wx-storm'); isleEl.classList.add('wx-'+weatherClass(w.weather)); }
     setStatus(`<span class="ic-dot"></span><span>Day ${w.day||1} · ${CY[w.cycle]||''} · ${wx}</span>`);
     const pulseEl=document.getElementById(pre+'-pulse'); if(w.pulse && pulseEl) pulseEl.textContent=w.pulse;
     if(w.pulse){ HAPPENINGS.push({where: isl.name || (isl.id.charAt(0).toUpperCase()+isl.id.slice(1)), pulse: w.pulse}); renderHappening(); }
@@ -476,8 +575,7 @@ function wireIsland(isl, isPrimary){
     let html='';
     Object.values(chars).forEach(c=>{
       if(!c || typeof c!=='object') return;
-      if(c.species==='dog') html+=`<span class="cast-dog" title="stray">🐾</span>`;
-      else if(c.name && c.name.trim()) html+=`<span class="cast-dot" style="background:${c.color||'#fde68a'}" title="${c.name}"></span>`;
+      if(c.name && c.name.trim() || c.species) html+=miniAvatar(c);
     });
     const el=document.getElementById(pre+'-cast'); if(el && html) el.innerHTML=html;
   }).catch(()=>{});
@@ -500,6 +598,32 @@ if(isTouch){
   });
   document.addEventListener('click',e=>{ document.querySelectorAll('.island.live.card-open').forEach(isle=>{ if(!isle.contains(e.target)) isle.classList.remove('card-open'); }); });
 }
+
+// ── subtle parallax depth (mouse on desktop, device-tilt on mobile) ──
+(function(){
+  const near=document.getElementById('islands-layer'), sun=document.getElementById('sun'), stars=document.getElementById('stars');
+  let tx=0,ty=0,cx=0,cy=0;
+  const set=(nx,ny)=>{tx=Math.max(-1,Math.min(1,nx));ty=Math.max(-1,Math.min(1,ny));};
+  window.addEventListener('mousemove',e=>set((e.clientX/innerWidth-.5)*2,(e.clientY/innerHeight-.5)*2),{passive:true});
+  window.addEventListener('deviceorientation',e=>{ if(e.gamma!=null) set(e.gamma/26,(e.beta-40)/26); },{passive:true});
+  function loop(){
+    cx+=(tx-cx)*.07; cy+=(ty-cy)*.07;
+    if(near) near.style.transform=`translate(${(-cx*15).toFixed(1)}px,${(-cy*9).toFixed(1)}px)`;
+    if(sun) sun.style.transform=`translate(${(cx*9).toFixed(1)}px,${(cy*5).toFixed(1)}px)`;
+    if(stars) stars.style.transform=`translate(${(cx*6).toFixed(1)}px,${(cy*4).toFixed(1)}px)`;
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+})();
+
+// ── first-visit intro (once per device) ──
+(function(){
+  const intro=document.getElementById('intro'); if(!intro) return;
+  try{ if(localStorage.getItem('new_intro_v1')){ intro.remove(); return; } }catch(e){}
+  const close=()=>{ intro.classList.add('closing'); try{localStorage.setItem('new_intro_v1','1')}catch(e){}; setTimeout(()=>intro.remove(),650); };
+  document.getElementById('intro-btn')?.addEventListener('click',close);
+  intro.addEventListener('click',e=>{ if(e.target===intro) close(); });
+})();
 </script>
 </body>
 </html>
