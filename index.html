@@ -115,13 +115,14 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0b1020;font-family:
   font-size:34px;color:rgba(255,255,255,.62);text-shadow:0 2px 10px rgba(0,0,0,.6)}
 
 /* ── HOVER / TAP STATUS CARD ── */
-.isle-card{position:absolute;left:50%;bottom:118%;transform:translateX(-50%) translateY(8px);
-  width:228px;background:rgba(8,14,30,.9);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+.isle-card{position:absolute;left:50%;bottom:118%;transform:translateX(calc(-50% + var(--card-dx,0px))) translateY(8px);
+  width:228px;max-width:calc(100vw - 20px);background:rgba(8,14,30,.9);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
   border:1px solid rgba(255,237,160,.18);border-radius:14px;padding:12px 14px;z-index:9;
   opacity:0;pointer-events:none;transition:opacity .22s ease,transform .22s ease;
   box-shadow:0 14px 40px rgba(0,0,0,.5)}
-.island.live:hover .isle-card,.island.card-open .isle-card{opacity:1;transform:translateX(-50%) translateY(0)}
-.isle-card::after{content:'';position:absolute;left:50%;top:100%;transform:translateX(-50%);
+.island.live:hover .isle-card,.island.card-open .isle-card{opacity:1;transform:translateX(calc(-50% + var(--card-dx,0px))) translateY(0)}
+/* arrow stays pointing at the island even when the card is nudged inward */
+.isle-card::after{content:'';position:absolute;left:calc(50% - var(--card-dx,0px));top:100%;transform:translateX(-50%);
   border:7px solid transparent;border-top-color:rgba(8,14,30,.9)}
 .ic-name{font-family:'Cinzel',serif;font-weight:700;color:#fde68a;letter-spacing:.06em;font-size:14px;margin-bottom:5px}
 .ic-status{font-size:11px;color:rgba(255,255,255,.62);letter-spacing:.4px;margin-bottom:7px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
@@ -265,8 +266,10 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0b1020;font-family:
 /* cast peek → mini character figures */
 .cast-peek{height:18px;gap:3px}
 .cast-fig{display:block;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5))}
-/* parallax layer smoothing handled in JS (no transform transition to avoid conflicts) */
-#islands-layer{position:absolute;inset:0;will-change:transform}
+/* z-index:5 preserves the islands' original stacking. NOTE: do NOT put a transform on this
+   wrapper — a transformed ancestor reparents the islands' absolutely-positioned status cards
+   and mis-renders them. Parallax therefore moves only the sky layers, never the islands. */
+#islands-layer{position:absolute;inset:0;z-index:5}
 
 /* shooting star (night only) */
 #shooting{position:absolute;top:14%;left:62%;width:2.4px;height:2.4px;border-radius:50%;background:#fff;
@@ -601,29 +604,48 @@ fetch('islands.json?t='+Date.now()).then(r=>r.json()).then(m=>{
   });
 }).catch(()=>{});
 
+// the rise-from-sea entrance ends on clip-path:inset(0) with fill-mode:both, which keeps
+// cropping each island to its own box — and crops the pop-up status card that sits ABOVE it.
+// A retained animation overrides an inline clip-path, so clear the ANIMATION once it's done
+// (leaves the island fully revealed, clip-path back to none, cards free to overflow).
+setTimeout(()=>document.querySelectorAll('.island').forEach(i=>{ i.style.animation='none'; i.style.clipPath='none'; }),1700);
+
+// ── keep a side-island's status card on-screen (nudge it inward, arrow follows) ──
+function positionCard(isle){
+  const card=isle.querySelector('.isle-card'); if(!card) return;
+  isle.style.setProperty('--card-dx','0px');           // reset, then measure natural box
+  const ib=isle.getBoundingClientRect(), cw=card.offsetWidth||220, m=10;
+  const cx=ib.left+ib.width/2; let dx=0;
+  if(cx+cw/2>innerWidth-m) dx=(innerWidth-m)-(cx+cw/2);
+  if(cx-cw/2+dx<m) dx=m-(cx-cw/2);
+  isle.style.setProperty('--card-dx',Math.round(dx)+'px');
+}
+// desktop: position the card as it's hovered open
+document.querySelectorAll('.island.live').forEach(isle=>{
+  isle.addEventListener('mouseenter',()=>positionCard(isle));
+});
+
 // ── mobile: tap toggles a live island's card before navigating ──
 const isTouch=window.matchMedia('(hover:none)').matches;
 if(isTouch){
   document.querySelectorAll('.island.live').forEach(isle=>{
-    isle.addEventListener('click',e=>{ if(!isle.classList.contains('card-open')){ e.preventDefault(); isle.classList.add('card-open'); } });
+    isle.addEventListener('click',e=>{ if(!isle.classList.contains('card-open')){ e.preventDefault(); positionCard(isle); isle.classList.add('card-open'); } });
   });
   document.addEventListener('click',e=>{ document.querySelectorAll('.island.live.card-open').forEach(isle=>{ if(!isle.contains(e.target)) isle.classList.remove('card-open'); }); });
 }
 
-// ── subtle parallax depth (mouse on desktop, device-tilt on mobile) ──
+// ── subtle parallax depth on the SKY only (sun + stars). The islands are deliberately
+//    left out: transforming their wrapper reparents their status cards and breaks them. ──
 (function(){
-  const near=document.getElementById('islands-layer'), sun=document.getElementById('sun'), stars=document.getElementById('stars');
+  const sun=document.getElementById('sun'), stars=document.getElementById('stars'), clouds=document.querySelector('.cloud.c2');
   let tx=0,ty=0,cx=0,cy=0;
   const set=(nx,ny)=>{tx=Math.max(-1,Math.min(1,nx));ty=Math.max(-1,Math.min(1,ny));};
   window.addEventListener('mousemove',e=>set((e.clientX/innerWidth-.5)*2,(e.clientY/innerHeight-.5)*2),{passive:true});
   window.addEventListener('deviceorientation',e=>{ if(e.gamma!=null) set(e.gamma/26,(e.beta-40)/26); },{passive:true});
-  // smaller travel on phones so a tilt can't shove a side-island past the edge
-  const nf = innerWidth<=680 ? 5 : 15;
   function loop(){
     cx+=(tx-cx)*.07; cy+=(ty-cy)*.07;
-    if(near) near.style.transform=`translate(${(-cx*nf).toFixed(1)}px,${(-cy*nf*0.6).toFixed(1)}px)`;
-    if(sun) sun.style.transform=`translate(${(cx*9).toFixed(1)}px,${(cy*5).toFixed(1)}px)`;
-    if(stars) stars.style.transform=`translate(${(cx*6).toFixed(1)}px,${(cy*4).toFixed(1)}px)`;
+    if(sun) sun.style.transform=`translate(${(cx*10).toFixed(1)}px,${(cy*6).toFixed(1)}px)`;
+    if(stars) stars.style.transform=`translate(${(cx*7).toFixed(1)}px,${(cy*4).toFixed(1)}px)`;
     requestAnimationFrame(loop);
   }
   requestAnimationFrame(loop);
