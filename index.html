@@ -638,7 +638,9 @@ function wireIsland(isl, isPrimary){
     const isleEl=document.getElementById('isle-'+isl.id);
     if(isleEl){ isleEl.classList.remove('wx-clear','wx-rain','wx-storm'); isleEl.classList.add('wx-'+weatherClass(w.weather)); }
     setStatus(`<span class="ic-dot"></span><span>Day ${w.day||1} · ${CY[w.cycle]||''} · ${wx}</span>`);
-    const pulseEl=document.getElementById(pre+'-pulse'); if(w.pulse && pulseEl) pulseEl.textContent=w.pulse;
+    // The card shows what the world is ABOUT (its blurb) — clearer for a first-time visitor than a
+    // mid-story thought. The live pulse still drives the footer "right now on…" ticker below.
+    const pulseEl=document.getElementById(pre+'-pulse'); if(pulseEl && isl.blurb) pulseEl.textContent=isl.blurb;
     if(w.pulse){ HAPPENINGS.push({where: isl.name || (isl.id.charAt(0).toUpperCase()+isl.id.slice(1)), pulse: w.pulse}); renderHappening(); }
     return (Math.max(1,w.day||1)-1)*4 + ((CYIDX[w.cycle]!=null)?CYIDX[w.cycle]:0) + 1;
   }).catch(()=>{ setStatus(`<span class="ic-dot"></span><span>Live · always running</span>`); return 0; });
