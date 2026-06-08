@@ -234,12 +234,12 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0b1020;font-family:
   .island.live .art svg{width:142px;height:auto}
   #isle-tropicana{left:50%!important}
   #isle-rimba{left:72%!important}
-  .island.soon{left:28%!important}
+  #isle-drivingdead{left:28%!important}
 }
 @media(max-width:380px){
   .island.live .art svg{width:128px}
   #isle-rimba{left:71%!important}
-  .island.soon{left:29%!important}
+  #isle-drivingdead{left:29%!important}
 }
 
 /* ════ LIVING ISLANDS — each island mirrors its world's real state ════ */
@@ -263,6 +263,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0b1020;font-family:
 @keyframes isleBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
 .island.live .art svg{animation:isleBob 6s ease-in-out infinite}
 #isle-rimba .art svg{animation-delay:-3s;animation-duration:6.8s}
+#isle-drivingdead .art svg{animation-delay:-1.6s;animation-duration:7.4s}
 /* cast peek → mini character figures */
 .cast-peek{height:18px;gap:3px}
 .cast-fig{display:block;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5))}
@@ -461,18 +462,74 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0b1020;font-family:
   </a>
 
 
-  <div class="island soon" style="left:21%;top:80%">
+  <a class="island live active" id="isle-drivingdead" href="https://adamdegoat.github.io/drivingdead/" style="left:21%;top:80%">
     <div class="shadow"></div>
     <div class="reflect"></div>
-    <div class="ripple" style="opacity:.5"></div>
-    <div class="fog"></div>
-    <div class="art"><svg width="110" height="86" viewBox="0 0 110 86">
-      <ellipse cx="55" cy="68" rx="46" ry="14" fill="#1f2d44" opacity=".7"/>
-      <path d="M20 68 Q55 30 90 68 Z" fill="#16233a"/>
-    </svg><div class="rim"></div></div>
-    <div class="qmark">?</div>
-    <div class="label">Coming soon</div>
-  </div>
+    <div class="ripple"></div>
+    <div class="art"><svg width="178" height="124" viewBox="0 0 178 124">
+      <!-- a lone crow circling high over the dead city -->
+      <g class="bird-orbit" fill="none" stroke="#11141a" stroke-width="1.6" stroke-linecap="round" opacity=".5">
+        <path d="M52 16 Q56 12 60 16 Q64 12 68 16"/>
+        <path d="M126 24 Q129 21 132 24 Q135 21 138 24"/>
+      </g>
+      <!-- concrete rooftop islet base -->
+      <ellipse cx="89" cy="103" rx="78" ry="22" fill="#3e4248"/>
+      <ellipse cx="89" cy="99" rx="68" ry="18" fill="#565a60"/>
+      <!-- hazy dead-city skyline rising behind the rooftop (far→near, smoke-tinged) -->
+      <g fill="#5e6670" opacity=".55"><rect x="30" y="52" width="13" height="50"/><rect x="48" y="44" width="10" height="58"/><rect x="120" y="48" width="12" height="54"/><rect x="138" y="56" width="11" height="46"/></g>
+      <g fill="#39414c"><rect x="40" y="60" width="16" height="44"/><rect x="60" y="50" width="18" height="54"/><rect x="104" y="56" width="17" height="48"/><rect x="126" y="46" width="16" height="58"/>
+        <!-- a snapped / collapsed tower -->
+        <path d="M82 64 L98 64 L98 104 L92 92 L82 100 Z"/></g>
+      <!-- a thin smoke plume from a distant fire -->
+      <path class="smoke" d="M46 60 Q43 50 47 41" stroke="rgba(120,126,134,.6)" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+      <!-- the deck parapet ledge -->
+      <rect x="18" y="86" width="142" height="5" rx="2" fill="#7a7e82"/>
+      <rect x="18" y="86" width="142" height="2" fill="#9298a0"/>
+      <!-- barricaded ramp edge (right): a wrecked car jammed across -->
+      <g>
+        <rect x="138" y="92" width="24" height="9" rx="3" fill="#5c2410"/>
+        <path d="M141 92 L144 87 L157 87 L160 92 Z" fill="#4a4e52"/>
+        <circle cx="144" cy="101" r="3.4" fill="#16191c"/><circle cx="156" cy="101" r="3.4" fill="#16191c"/>
+        <rect x="146" y="83" width="9" height="6" rx="1.5" fill="#f59e0b" opacity=".85"/>
+      </g>
+      <!-- a solar array on a tilted frame -->
+      <g transform="translate(108 88)">
+        <line x1="4" y1="12" x2="4" y2="4" stroke="#39414c" stroke-width="2"/><line x1="20" y1="12" x2="20" y2="6" stroke="#39414c" stroke-width="2"/>
+        <rect x="-2" y="-2" width="28" height="9" rx="1.5" fill="#15293f" transform="rotate(-9 12 3)"/>
+      </g>
+      <!-- the SOLAR CAMPER VAN (hero prop), dug in centre -->
+      <g>
+        <ellipse cx="74" cy="99" rx="30" ry="5" fill="#1c2027" opacity=".5"/>
+        <!-- solar panels on the roof -->
+        <rect x="55" y="74" width="40" height="5" rx="1.5" fill="#15293f"/>
+        <!-- body -->
+        <rect x="52" y="79" width="46" height="15" rx="3.5" fill="#d2d6d2"/>
+        <rect x="52" y="78" width="20" height="9" rx="2.5" fill="#c2c7c4"/>
+        <!-- amber accent stripe -->
+        <rect x="52" y="88" width="46" height="2.6" rx="1" fill="#f59e0b"/>
+        <!-- warm glowing window (mirrors POWER on) -->
+        <rect class="isle-window" x="76" y="81" width="9" height="5" rx="1" fill="#ffd98a"/>
+        <rect x="56" y="81" width="9" height="5" rx="1" fill="#1c2630"/>
+        <!-- wheels -->
+        <circle cx="62" cy="94" r="4" fill="#16191c"/><circle cx="88" cy="94" r="4" fill="#16191c"/>
+        <circle cx="62" cy="94" r="1.6" fill="#6b7078"/><circle cx="88" cy="94" r="1.6" fill="#6b7078"/>
+        <!-- radio mast + blinking telltale -->
+        <line x1="96" y1="79" x2="99" y2="69" stroke="#39414c" stroke-width="1.4"/>
+        <circle class="isle-ember" cx="99" cy="68" r="1.8" fill="#22d3ee" opacity=".8"/>
+      </g>
+      <!-- warm light pooling on the deck from the van -->
+      <ellipse class="isle-ember" cx="80" cy="97" rx="14" ry="3.5" fill="#fbbf24" opacity=".4"/>
+    </svg><div class="rim"></div><div class="wx-layer"></div></div>
+    <div class="label">Driving Dead</div>
+    <div class="cast-peek" id="dd-cast"></div>
+    <div class="isle-card">
+      <div class="ic-name">Driving Dead</div>
+      <div class="ic-status" id="dd-status"><span class="ic-dot"></span><span>Loading…</span></div>
+      <div class="ic-next" id="dd-next"><span class="tick"></span><span>next chapter soon</span></div>
+      <div class="ic-pulse" id="dd-pulse">A couple in a solar camper van, dug in on a rooftop above a dead city.</div>
+      <div class="ic-go">Enter island ›</div>
+    </div>
+  </a>
   </div><!-- /islands-layer -->
 
   <!-- compass -->
@@ -571,7 +628,7 @@ setInterval(()=>{ if(HAPPENINGS.length>1){ hapIdx=(hapIdx+1)%HAPPENINGS.length; 
 
 // ── live status driven by the islands.json registry; each live island wires its own card ──
 const CYIDX={morning:0,midday:1,evening:2,night:3};
-const CARD={tropicana:'trop', rimba:'rimba'};   // island id -> card id prefix
+const CARD={tropicana:'trop', rimba:'rimba', drivingdead:'dd'};   // island id -> card id prefix
 function wireIsland(isl, isPrimary){
   const pre=CARD[isl.id]; if(!pre || !isl.data) return Promise.resolve(0);
   const setStatus=(html)=>{ const e=document.getElementById(pre+'-status'); if(e) e.innerHTML=html; };

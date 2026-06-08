@@ -12,13 +12,13 @@
       "pos": { "left": "50%", "top": "70%" }
     },
     {
-      "id": "world02",
+      "id": "drivingdead",
       "world_no": 2,
-      "name": "Coming soon",
-      "status": "soon",
-      "url": null,
-      "data": null,
-      "blurb": null,
+      "name": "Driving Dead",
+      "status": "live",
+      "url": "https://adamdegoat.github.io/drivingdead/",
+      "data": "https://adamdegoat.github.io/drivingdead/data",
+      "blurb": "A couple in a solar camper van, dug in on a rooftop above a dead city.",
       "pos": { "left": "21%", "top": "80%" }
     },
     {
