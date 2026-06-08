@@ -228,6 +228,17 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0b1020;font-family:
   #compass{width:54px;height:54px}
   #happening{font-size:10.5px;max-width:92vw}
   #chronicle{font-size:8.5px;letter-spacing:.16em}
+  /* keep the outer islands clear of the screen edges on narrow phones:
+     shrink the live-island art + pull the side islands inward */
+  .island.live .art svg{width:142px;height:auto}
+  #isle-tropicana{left:50%!important}
+  #isle-rimba{left:72%!important}
+  .island.soon{left:28%!important}
+}
+@media(max-width:380px){
+  .island.live .art svg{width:128px}
+  #isle-rimba{left:71%!important}
+  .island.soon{left:29%!important}
 }
 
 /* ════ LIVING ISLANDS — each island mirrors its world's real state ════ */
@@ -606,9 +617,11 @@ if(isTouch){
   const set=(nx,ny)=>{tx=Math.max(-1,Math.min(1,nx));ty=Math.max(-1,Math.min(1,ny));};
   window.addEventListener('mousemove',e=>set((e.clientX/innerWidth-.5)*2,(e.clientY/innerHeight-.5)*2),{passive:true});
   window.addEventListener('deviceorientation',e=>{ if(e.gamma!=null) set(e.gamma/26,(e.beta-40)/26); },{passive:true});
+  // smaller travel on phones so a tilt can't shove a side-island past the edge
+  const nf = innerWidth<=680 ? 5 : 15;
   function loop(){
     cx+=(tx-cx)*.07; cy+=(ty-cy)*.07;
-    if(near) near.style.transform=`translate(${(-cx*15).toFixed(1)}px,${(-cy*9).toFixed(1)}px)`;
+    if(near) near.style.transform=`translate(${(-cx*nf).toFixed(1)}px,${(-cy*nf*0.6).toFixed(1)}px)`;
     if(sun) sun.style.transform=`translate(${(cx*9).toFixed(1)}px,${(cy*5).toFixed(1)}px)`;
     if(stars) stars.style.transform=`translate(${(cx*6).toFixed(1)}px,${(cy*4).toFixed(1)}px)`;
     requestAnimationFrame(loop);
