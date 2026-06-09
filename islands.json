@@ -9,7 +9,10 @@
       "url": "https://adamdegoat.github.io/loveisland/",
       "data": "https://adamdegoat.github.io/loveisland/data",
       "blurb": "A deserted island where castaways find each other.",
-      "pos": { "left": "50%", "top": "70%" }
+      "pos": {
+        "left": "50%",
+        "top": "70%"
+      }
     },
     {
       "id": "drivingdead",
@@ -19,7 +22,10 @@
       "url": "https://adamdegoat.github.io/drivingdead/",
       "data": "https://adamdegoat.github.io/drivingdead/data",
       "blurb": "A couple in a solar camper van, dug in on a rooftop above a dead city.",
-      "pos": { "left": "21%", "top": "80%" }
+      "pos": {
+        "left": "21%",
+        "top": "80%"
+      }
     },
     {
       "id": "rimba",
@@ -29,17 +35,23 @@
       "url": "https://adamdegoat.github.io/rimba/",
       "data": "https://adamdegoat.github.io/rimba/data",
       "blurb": "Two Singaporeans & a cat, stranded deep in the Malaysian jungle.",
-      "pos": { "left": "79%", "top": "83%" }
+      "pos": {
+        "left": "79%",
+        "top": "83%"
+      }
     },
     {
-      "id": "world04",
+      "id": "alaskanboys",
       "world_no": 4,
-      "name": "Coming soon",
-      "status": "soon",
-      "url": null,
-      "data": null,
-      "blurb": null,
-      "pos": { "left": "38%", "top": "58%" }
+      "name": "Alaskan Boys",
+      "status": "live",
+      "url": "https://adamdegoat.github.io/alaskanboys/",
+      "data": "https://adamdegoat.github.io/alaskanboys/data",
+      "blurb": "A family building an off-grid homestead in the wild Alaskan interior.",
+      "pos": {
+        "left": "38%",
+        "top": "58%"
+      }
     },
     {
       "id": "world05",
@@ -49,7 +61,10 @@
       "url": null,
       "data": null,
       "blurb": null,
-      "pos": { "left": "63%", "top": "60%" }
+      "pos": {
+        "left": "63%",
+        "top": "60%"
+      }
     }
   ]
 }
