@@ -120,10 +120,12 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0b1020;font-family:
   border:1px solid rgba(255,237,160,.18);border-radius:14px;padding:12px 14px;z-index:9;
   opacity:0;pointer-events:none;transition:opacity .22s ease,transform .22s ease;
   box-shadow:0 14px 40px rgba(0,0,0,.5)}
-.island.live:hover .isle-card,.island.card-open .isle-card{opacity:1;pointer-events:auto;transform:translateX(calc(-50% + var(--card-dx,0px))) translateY(0)}
+.island.live:hover .isle-card,.island.card-open .isle-card,.island.live:focus-visible .isle-card{opacity:1;pointer-events:auto;transform:translateX(calc(-50% + var(--card-dx,0px))) translateY(0)}
 /* raise the focused island (and thus its pop-up card) above sibling islands, or a later
    island painted on top would swallow taps meant for the card / "Enter island" link */
-.island.live:hover,.island.card-open{z-index:20}
+.island.live:hover,.island.card-open,.island:focus-visible{z-index:20}
+/* (#3) visible keyboard focus ring — islands are real links; give them an on-brand focus state */
+.island:focus-visible{outline:2px solid #fde68a;outline-offset:5px;border-radius:14px}
 /* arrow stays pointing at the island even when the card is nudged inward */
 .isle-card::after{content:'';position:absolute;left:calc(50% - var(--card-dx,0px));top:100%;transform:translateX(-50%);
   border:7px solid transparent;border-top-color:rgba(8,14,30,.9)}
@@ -237,11 +239,13 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0b1020;font-family:
      the three live worlds spread below. Smaller art gives every island breathing room. */
   .island.live .art svg{width:128px;height:auto}
   .island.soon .art svg{width:104px;height:auto}
-  #isle-world04{left:27%!important;top:55%!important}
-  #isle-world05{left:73%!important;top:55%!important}
-  #isle-drivingdead{left:25%!important;top:72%!important}
-  #isle-tropicana{left:75%!important;top:72%!important}
-  #isle-rimba{left:50%!important;top:88%!important}
+  #isle-world04{left:27%!important;top:53%!important}
+  #isle-world05{left:73%!important;top:53%!important}
+  #isle-drivingdead{left:23%!important;top:69%!important}
+  #isle-tropicana{left:77%!important;top:69%!important}
+  #isle-rimba{left:50%!important;top:83%!important}
+  /* keep the footer ticker a bounded height so a long pulse can't grow up into the bottom island */
+  #happening{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 }
 @media(max-width:380px){
   .island.live .art svg{width:116px}
@@ -311,6 +315,33 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0b1020;font-family:
   background:linear-gradient(180deg,#fde68a,#f59e0b);border:none;border-radius:12px;padding:11px 26px;
   box-shadow:0 8px 24px rgba(251,191,36,.28);transition:transform .15s ease,box-shadow .15s ease}
 #intro-btn:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(251,191,36,.4)}
+
+/* ════ UX-AUDIT POLISH (2026-06-09) ════ */
+/* (#4) footer: a soft scrim lifts the faint ticker off the bright daytime sea AND separates it
+   visually from the bottom island; bump the text legibility too */
+#footer::before{content:'';position:absolute;left:0;right:0;bottom:-13px;top:-14px;z-index:-1;pointer-events:none;
+  background:linear-gradient(0deg,rgba(4,8,20,.6) 0%,rgba(4,8,20,.34) 55%,transparent 100%)}
+#happening{color:rgba(255,255,255,.85);text-shadow:0 1px 7px rgba(0,0,0,.55)}
+#chronicle{color:rgba(255,255,255,.62);text-shadow:0 1px 5px rgba(0,0,0,.5)}
+
+/* (#7) the live status dot gently pulses, reinforcing "this world is running right now" */
+.ic-dot{animation:liveDot 2.2s ease-in-out infinite}
+@keyframes liveDot{0%,100%{box-shadow:0 0 7px #4ade80;opacity:1}50%{box-shadow:0 0 13px #4ade80;opacity:.6}}
+
+/* (#6) coming-soon islands acknowledge a tap/hover instead of feeling broken */
+.island.soon{cursor:help}
+.island.soon .soon-hint{position:absolute;bottom:104%;left:50%;transform:translateX(-50%) translateY(5px);
+  white-space:nowrap;font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;letter-spacing:.04em;
+  color:rgba(255,247,230,.92);background:rgba(8,14,30,.9);border:1px solid rgba(255,237,160,.2);
+  padding:5px 10px;border-radius:9px;opacity:0;pointer-events:none;transition:opacity .2s ease,transform .2s ease;
+  box-shadow:0 10px 26px rgba(0,0,0,.5)}
+.island.soon:hover .soon-hint,.island.soon:active .soon-hint{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* (#2) respect reduced-motion: stop the ambient loops for sensitive visitors + save battery */
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;
+    transition-duration:.01ms!important;scroll-behavior:auto!important}
+}
 </style>
 </head>
 <body>
@@ -324,14 +355,14 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0b1020;font-family:
   <div id="sun-trail"></div>
   <div id="trop-glow"></div>
 
-  <div class="cloud c1"><svg width="150" height="46" viewBox="0 0 150 46"><g fill="#fff"><ellipse cx="46" cy="28" rx="44" ry="17"/><ellipse cx="84" cy="20" rx="34" ry="15"/><ellipse cx="116" cy="30" rx="30" ry="13"/></g></svg></div>
-  <div class="cloud c2"><svg width="120" height="40" viewBox="0 0 120 40"><g fill="#fff"><ellipse cx="38" cy="24" rx="36" ry="14"/><ellipse cx="72" cy="17" rx="28" ry="12"/><ellipse cx="98" cy="26" rx="22" ry="11"/></g></svg></div>
-  <div class="cloud c3"><svg width="100" height="34" viewBox="0 0 100 34"><g fill="#fff"><ellipse cx="32" cy="21" rx="30" ry="12"/><ellipse cx="62" cy="15" rx="24" ry="10"/><ellipse cx="84" cy="22" rx="18" ry="9"/></g></svg></div>
+  <div class="cloud c1" aria-hidden="true"><svg width="150" height="46" viewBox="0 0 150 46"><g fill="#fff"><ellipse cx="46" cy="28" rx="44" ry="17"/><ellipse cx="84" cy="20" rx="34" ry="15"/><ellipse cx="116" cy="30" rx="30" ry="13"/></g></svg></div>
+  <div class="cloud c2" aria-hidden="true"><svg width="120" height="40" viewBox="0 0 120 40"><g fill="#fff"><ellipse cx="38" cy="24" rx="36" ry="14"/><ellipse cx="72" cy="17" rx="28" ry="12"/><ellipse cx="98" cy="26" rx="22" ry="11"/></g></svg></div>
+  <div class="cloud c3" aria-hidden="true"><svg width="100" height="34" viewBox="0 0 100 34"><g fill="#fff"><ellipse cx="32" cy="21" rx="30" ry="12"/><ellipse cx="62" cy="15" rx="24" ry="10"/><ellipse cx="84" cy="22" rx="18" ry="9"/></g></svg></div>
 
   <div id="sea-shimmer"></div>
 
   <!-- drifting boat -->
-  <div id="boat"><svg class="hull" width="60" height="54" viewBox="0 0 60 54">
+  <div id="boat" aria-hidden="true"><svg class="hull" width="60" height="54" viewBox="0 0 60 54">
     <path d="M6 40 L54 40 L47 51 L13 51 Z" fill="#3b2417"/>
     <rect x="29" y="9" width="2.5" height="31" fill="#5c3a22"/>
     <path d="M31.5 11 L48 33 L31.5 33 Z" fill="#fef3c7"/>
@@ -340,7 +371,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0b1020;font-family:
 
   <!-- TITLE -->
   <div id="title">
-    <svg id="emblem" width="40" height="40" viewBox="0 0 40 40">
+    <svg id="emblem" width="40" height="40" viewBox="0 0 40 40" aria-hidden="true">
       <g stroke="#fde68a" stroke-width="1.4" stroke-linecap="round">
         <line x1="20" y1="2" x2="20" y2="8"/><line x1="20" y1="32" x2="20" y2="38"/>
         <line x1="2" y1="20" x2="8" y2="20"/><line x1="32" y1="20" x2="38" y2="20"/>
@@ -349,7 +380,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0b1020;font-family:
       <circle cx="20" cy="20" r="8" fill="#fde68a"/><circle cx="20" cy="20" r="5" fill="#fff7e0"/>
     </svg>
     <h1>NEVER ENDING WORLD</h1>
-    <svg id="flourish" width="220" height="14" viewBox="0 0 220 14">
+    <svg id="flourish" width="220" height="14" viewBox="0 0 220 14" aria-hidden="true">
       <g stroke="rgba(255,237,160,.6)" stroke-width="1" fill="none">
         <path d="M4 7 H92"/><path d="M128 7 H216"/>
       </g>
@@ -363,7 +394,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0b1020;font-family:
   <!-- ISLANDS (wrapped in a parallax layer) -->
   <div id="islands-layer">
   <!-- Tropicana (live) -->
-  <a class="island live active" id="isle-tropicana" href="https://adamdegoat.github.io/loveisland/" style="left:50%;top:70%">
+  <a class="island live active" id="isle-tropicana" href="https://adamdegoat.github.io/loveisland/" aria-label="Enter Tropicana — a living story world" style="left:50%;top:70%">
     <div class="shadow"></div>
     <div class="reflect"></div>
     <div class="ripple"></div>
@@ -412,7 +443,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0b1020;font-family:
   </a>
 
   <!-- Rimba (live) — Malaysian jungle survival -->
-  <a class="island live active" id="isle-rimba" href="https://adamdegoat.github.io/rimba/" style="left:79%;top:83%">
+  <a class="island live active" id="isle-rimba" href="https://adamdegoat.github.io/rimba/" aria-label="Enter Rimba — a living story world" style="left:79%;top:83%">
     <div class="shadow"></div>
     <div class="reflect"></div>
     <div class="ripple"></div>
@@ -472,7 +503,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0b1020;font-family:
   </a>
 
 
-  <a class="island live active" id="isle-drivingdead" href="https://adamdegoat.github.io/drivingdead/" style="left:21%;top:80%">
+  <a class="island live active" id="isle-drivingdead" href="https://adamdegoat.github.io/drivingdead/" aria-label="Enter Driving Dead — a living story world" style="left:21%;top:80%">
     <div class="shadow"></div>
     <div class="reflect"></div>
     <div class="ripple"></div>
@@ -542,7 +573,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0b1020;font-family:
   </a>
 
   <!-- ── Coming-soon islands (worlds 04 + 05) — distant shapes still forming out in the mist ── -->
-  <div class="island soon" id="isle-world04" style="left:38%;top:58%">
+  <div class="island soon" id="isle-world04" role="img" aria-label="A new story world, coming soon" style="left:38%;top:58%">
     <div class="shadow"></div>
     <div class="reflect"></div>
     <div class="ripple" style="opacity:.45"></div>
@@ -553,8 +584,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0b1020;font-family:
     </svg><div class="rim"></div></div>
     <div class="qmark">?</div>
     <div class="label">Coming soon</div>
+    <div class="soon-hint">A new world is brewing</div>
   </div>
-  <div class="island soon" id="isle-world05" style="left:63%;top:60%">
+  <div class="island soon" id="isle-world05" role="img" aria-label="A new story world, coming soon" style="left:63%;top:60%">
     <div class="shadow"></div>
     <div class="reflect"></div>
     <div class="ripple" style="opacity:.45"></div>
@@ -566,11 +598,12 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0b1020;font-family:
     </svg><div class="rim"></div></div>
     <div class="qmark">?</div>
     <div class="label">Coming soon</div>
+    <div class="soon-hint">A new world is brewing</div>
   </div>
   </div><!-- /islands-layer -->
 
   <!-- compass -->
-  <svg id="compass" width="64" height="64" viewBox="0 0 64 64">
+  <svg id="compass" width="64" height="64" viewBox="0 0 64 64" aria-hidden="true">
     <circle cx="32" cy="32" r="30" fill="none" stroke="rgba(255,237,160,.5)" stroke-width="1.5"/>
     <circle cx="32" cy="32" r="23" fill="none" stroke="rgba(255,237,160,.25)" stroke-width="1"/>
     <path d="M32 6 L37 32 L32 28 L27 32 Z" fill="#fde68a"/>
@@ -719,6 +752,7 @@ function positionCard(isle){
 // desktop: position the card as it's hovered open
 document.querySelectorAll('.island.live').forEach(isle=>{
   isle.addEventListener('mouseenter',()=>positionCard(isle));
+  isle.addEventListener('focus',()=>positionCard(isle));   // keyboard focus opens the card too — keep it on-screen
 });
 
 // ── mobile: tap toggles a live island's card before navigating ──
