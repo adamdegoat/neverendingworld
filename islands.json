@@ -54,16 +54,16 @@
       }
     },
     {
-      "id": "world05",
+      "id": "bfc",
       "world_no": 5,
-      "name": "Coming soon",
-      "status": "soon",
-      "url": null,
-      "data": null,
-      "blurb": null,
+      "name": "BFC",
+      "status": "live",
+      "url": "https://adamdegoat.github.io/bfc/",
+      "data": "https://adamdegoat.github.io/bfc/data",
+      "blurb": "Fifty fighters, five divisions, one belt each — a fight promotion that never stops.",
       "pos": {
-        "left": "63%",
-        "top": "60%"
+        "left": "62%",
+        "top": "56%"
       }
     }
   ]
