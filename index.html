@@ -120,7 +120,10 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0b1020;font-family:
   border:1px solid rgba(255,237,160,.18);border-radius:14px;padding:12px 14px;z-index:9;
   opacity:0;pointer-events:none;transition:opacity .22s ease,transform .22s ease;
   box-shadow:0 14px 40px rgba(0,0,0,.5)}
-.island.live:hover .isle-card,.island.card-open .isle-card{opacity:1;transform:translateX(calc(-50% + var(--card-dx,0px))) translateY(0)}
+.island.live:hover .isle-card,.island.card-open .isle-card{opacity:1;pointer-events:auto;transform:translateX(calc(-50% + var(--card-dx,0px))) translateY(0)}
+/* raise the focused island (and thus its pop-up card) above sibling islands, or a later
+   island painted on top would swallow taps meant for the card / "Enter island" link */
+.island.live:hover,.island.card-open{z-index:20}
 /* arrow stays pointing at the island even when the card is nudged inward */
 .isle-card::after{content:'';position:absolute;left:calc(50% - var(--card-dx,0px));top:100%;transform:translateX(-50%);
   border:7px solid transparent;border-top-color:rgba(8,14,30,.9)}
@@ -229,17 +232,24 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0b1020;font-family:
   #compass{width:54px;height:54px}
   #happening{font-size:10.5px;max-width:92vw}
   #chronicle{font-size:8.5px;letter-spacing:.16em}
-  /* keep the outer islands clear of the screen edges on narrow phones:
-     shrink the live-island art + pull the side islands inward */
-  .island.live .art svg{width:142px;height:auto}
-  #isle-tropicana{left:50%!important}
-  #isle-rimba{left:72%!important}
-  #isle-drivingdead{left:28%!important}
+  /* Phones can't fit the wide desktop scatter, so re-lay the islands into a clean,
+     NON-overlapping 2-2-1 archipelago: the two "coming soon" up near the horizon,
+     the three live worlds spread below. Smaller art gives every island breathing room. */
+  .island.live .art svg{width:128px;height:auto}
+  .island.soon .art svg{width:104px;height:auto}
+  #isle-world04{left:27%!important;top:55%!important}
+  #isle-world05{left:73%!important;top:55%!important}
+  #isle-drivingdead{left:25%!important;top:72%!important}
+  #isle-tropicana{left:75%!important;top:72%!important}
+  #isle-rimba{left:50%!important;top:88%!important}
 }
 @media(max-width:380px){
-  .island.live .art svg{width:128px}
-  #isle-rimba{left:71%!important}
-  #isle-drivingdead{left:29%!important}
+  .island.live .art svg{width:116px}
+  .island.soon .art svg{width:92px}
+  #isle-world04{left:26%!important}
+  #isle-world05{left:74%!important}
+  #isle-drivingdead{left:24%!important}
+  #isle-tropicana{left:76%!important}
 }
 
 /* ════ LIVING ISLANDS — each island mirrors its world's real state ════ */
@@ -532,7 +542,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0b1020;font-family:
   </a>
 
   <!-- ── Coming-soon islands (worlds 04 + 05) — distant shapes still forming out in the mist ── -->
-  <div class="island soon" style="left:38%;top:58%">
+  <div class="island soon" id="isle-world04" style="left:38%;top:58%">
     <div class="shadow"></div>
     <div class="reflect"></div>
     <div class="ripple" style="opacity:.45"></div>
@@ -544,7 +554,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0b1020;font-family:
     <div class="qmark">?</div>
     <div class="label">Coming soon</div>
   </div>
-  <div class="island soon" style="left:63%;top:60%">
+  <div class="island soon" id="isle-world05" style="left:63%;top:60%">
     <div class="shadow"></div>
     <div class="reflect"></div>
     <div class="ripple" style="opacity:.45"></div>
@@ -715,7 +725,7 @@ document.querySelectorAll('.island.live').forEach(isle=>{
 const isTouch=window.matchMedia('(hover:none)').matches;
 if(isTouch){
   document.querySelectorAll('.island.live').forEach(isle=>{
-    isle.addEventListener('click',e=>{ if(!isle.classList.contains('card-open')){ e.preventDefault(); positionCard(isle); isle.classList.add('card-open'); } });
+    isle.addEventListener('click',e=>{ if(e.target.closest('.isle-card')) return; /* tapping the open card (incl. "Enter island") → let the link navigate */ if(!isle.classList.contains('card-open')){ e.preventDefault(); positionCard(isle); isle.classList.add('card-open'); } });
   });
   document.addEventListener('click',e=>{ document.querySelectorAll('.island.live.card-open').forEach(isle=>{ if(!isle.contains(e.target)) isle.classList.remove('card-open'); }); });
 }
