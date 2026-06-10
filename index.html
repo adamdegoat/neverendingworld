@@ -708,7 +708,7 @@ applyTime(); setInterval(applyTime,5*60000);
 
 // ── live status from Tropicana (same-origin once deployed; fails gracefully) ──
 const WX={clear:'☀️ Clear',sunny:'☀️ Clear',hot:'🔥 Hot',rain:'🌧️ Rain',storm:'⛈️ Storm',overcast:'☁️ Overcast',cloudy:'☁️ Cloudy',foggy:'🌫️ Fog'};
-const CY={morning:'Morning',midday:'Midday',evening:'Evening',night:'Night'};
+const CY={morning:'Morning',midday:'Midday',afternoon:'Afternoon',evening:'Evening',night:'Night'};
 // classify a world's weather string → an island weather class
 function weatherClass(w){const s=(w||'').toLowerCase();
   if(/storm|thunder|gale|squall|cyclone|monsoon|deluge/.test(s)) return 'storm';
@@ -732,11 +732,11 @@ function miniAvatar(c){
     +`<circle cx="9" cy="8.6" r="5.4" fill="${skin}"/>`
     +`<path d="M3.6 8.6 Q3 2.4 9 2.4 Q15 2.4 14.4 8.6 Q14 4.6 9 4.6 Q4 4.6 3.6 8.6 Z" fill="${hair}"/>`
     +extra+`</svg>`;}
-// ── next-chapter countdown (cycles at SGT 7:00, 12:30, 18:00, 23:00) ──
+// ── next-chapter countdown (5x daily: SGT 7:00, 11:30, 15:00, 18:30, 22:30) ──
 function nextChapter(){
   const n=new Date(); const sgt=new Date(n.getTime()+n.getTimezoneOffset()*60000+8*3600000);
   const mins=sgt.getHours()*60+sgt.getMinutes();
-  const slots=[7*60,12*60+30,18*60,23*60];
+  const slots=[7*60,11*60+30,15*60,18*60+30,22*60+30];
   let next=slots.find(s=>s>mins); if(next==null) next=slots[0]+1440;
   const d=next-mins, h=Math.floor(d/60), m=d%60;
   return h>0?`${h}h ${m}m`:`${m}m`;
@@ -759,7 +759,7 @@ function renderHappening(){
 setInterval(()=>{ if(HAPPENINGS.length>1){ hapIdx=(hapIdx+1)%HAPPENINGS.length; renderHappening(); } },6000);
 
 // ── live status driven by the islands.json registry; each live island wires its own card ──
-const CYIDX={morning:0,midday:1,evening:2,night:3};
+const CYIDX={morning:0,midday:1,afternoon:2,evening:3,night:4};
 const CARD={tropicana:'trop', rimba:'rimba', drivingdead:'dd', alaskanboys:'ak', bfc:'bfc'};   // island id -> card id prefix
 function wireIsland(isl, isPrimary){
   const pre=CARD[isl.id]; if(!pre || !isl.data) return Promise.resolve(0);
@@ -774,7 +774,7 @@ function wireIsland(isl, isPrimary){
     // mid-story thought. The live pulse still drives the footer "right now on…" ticker below.
     const pulseEl=document.getElementById(pre+'-pulse'); if(pulseEl && isl.blurb) pulseEl.textContent=isl.blurb;
     if(w.pulse){ HAPPENINGS.push({where: isl.name || (isl.id.charAt(0).toUpperCase()+isl.id.slice(1)), pulse: w.pulse}); renderHappening(); }
-    return (Math.max(1,w.day||1)-1)*4 + ((CYIDX[w.cycle]!=null)?CYIDX[w.cycle]:0) + 1;
+    return (Math.max(1,w.day||1)-1)*5 + ((CYIDX[w.cycle]!=null)?CYIDX[w.cycle]:0) + 1;
   }).catch(()=>{ setStatus(`<span class="ic-dot"></span><span>Live · always running</span>`); return 0; });
   fetch(isl.data+'/characters.json?t='+Date.now()).then(r=>r.json()).then(chars=>{
     let html='';
