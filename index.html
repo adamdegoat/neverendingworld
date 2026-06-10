@@ -143,6 +143,28 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0b1020;font-family:
 #vignette{position:absolute;inset:0;z-index:9;pointer-events:none;
   background:radial-gradient(130% 100% at 50% 42%,transparent 56%,rgba(2,6,23,.22) 84%,rgba(2,6,23,.5) 100%)}
 
+/* ── shared cycle timeline + countdown (all worlds refresh together) ── */
+.cyclebar{display:flex;flex-direction:column;align-items:center;gap:8px;margin:16px auto 2px;width:fit-content;max-width:94vw;
+  background:rgba(8,14,28,.46);border:1px solid rgba(255,237,160,.16);border-radius:15px;padding:12px 18px;
+  backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);box-shadow:0 8px 26px -12px rgba(0,0,0,.6)}
+.cb-steps{display:flex;align-items:center;gap:5px;flex-wrap:wrap;justify-content:center}
+.cb-step{font:700 10.5px/1 'Plus Jakarta Sans',system-ui,sans-serif;color:rgba(255,255,255,.42);
+  padding:5px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.13);display:inline-flex;align-items:center;gap:5px;transition:color .4s,background .4s,border-color .4s}
+.cb-step .cbd{width:5px;height:5px;border-radius:50%;background:currentColor;opacity:.55}
+.cb-step.done{color:rgba(255,237,160,.7);border-color:rgba(255,237,160,.28);background:rgba(255,237,160,.06)}
+.cb-step.live{color:#0c1320;background:linear-gradient(135deg,#fde68a,#f6c948);border-color:#fde68a;font-weight:800;
+  box-shadow:0 0 16px rgba(253,230,138,.55)}
+.cb-step.live .cbd{background:#0c1320;opacity:.8;animation:cbPulse 1.3s ease-in-out infinite}
+.cb-arr{color:rgba(255,255,255,.16);font-size:9px}
+.cb-next{font:700 12px/1 'Plus Jakarta Sans',system-ui,sans-serif;color:rgba(253,230,138,.92);
+  display:flex;align-items:center;gap:7px;letter-spacing:.2px}
+.cb-next b{color:#fff;font-weight:800}
+.cb-next .cb-dot{width:6px;height:6px;border-radius:50%;background:#fde68a;box-shadow:0 0 8px #fde68a;animation:cbPulse 2s ease-in-out infinite;flex-shrink:0}
+.cb-next.posting{color:#aef5c6}.cb-next.posting .cb-dot{background:#5dffb0;box-shadow:0 0 8px #5dffb0}
+.cb-sub{font-size:9.5px;color:rgba(255,255,255,.4);font-weight:600;letter-spacing:.2px;text-align:center}
+@keyframes cbPulse{0%,100%{opacity:1}50%{opacity:.4}}
+@media(max-width:560px){.cyclebar{padding:10px 13px;gap:6px}.cb-step{font-size:9px;padding:4px 8px}.cb-next{font-size:11px}.cb-sub{font-size:8.5px}}
+
 /* manifesto — the project's soul, under the subtitle */
 .manifesto{margin-top:.55rem;font-size:clamp(10px,1.45vw,13px);font-style:italic;letter-spacing:.04em;
   color:rgba(255,247,230,.55);animation:fadeDown 1.1s ease .5s both}
@@ -389,6 +411,11 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0b1020;font-family:
     </svg>
     <div class="sub">A living world of stories</div>
     <div class="manifesto">Worlds that write themselves — no script, no crew, no end.</div>
+    <div class="cyclebar" id="cyclebar" aria-label="Story cycle timeline">
+      <div class="cb-steps" id="cbSteps"></div>
+      <div class="cb-next"><span class="cb-dot"></span><span id="cbNext">Next chapter · —</span></div>
+      <div class="cb-sub">Every world updates together — 7am · 11:30am · 3pm · 6:30pm · 10:30pm SGT</div>
+    </div>
   </div>
 
   <!-- ISLANDS (wrapped in a parallax layer) -->
@@ -786,14 +813,59 @@ function wireIsland(isl, isPrimary){
   }).catch(()=>{});
   return p;
 }
-fetch('islands.json?t='+Date.now()).then(r=>r.json()).then(m=>{
-  const live=(m.islands||[]).filter(i=>i.status==='live');
-  Promise.all(live.map((isl,i)=>wireIsland(isl, i===0))).then(chaps=>{
-    const total=chaps.reduce((a,b)=>a+(b||0),0);
-    const el=document.getElementById('chronicle');
-    if(el) el.textContent=`${live.length} living world${live.length>1?'s':''} · ${total} chapters lived · and counting`;
-  });
-}).catch(()=>{});
+function loadIslands(){
+  HAPPENINGS.length=0; hapIdx=0;
+  return fetch('islands.json?t='+Date.now()).then(r=>r.json()).then(m=>{
+    const live=(m.islands||[]).filter(i=>i.status==='live');
+    return Promise.all(live.map((isl,i)=>wireIsland(isl, i===0))).then(chaps=>{
+      const total=chaps.reduce((a,b)=>a+(b||0),0);
+      const el=document.getElementById('chronicle');
+      if(el) el.textContent=`${live.length} living world${live.length>1?'s':''} · ${total} chapters lived · and counting`;
+    });
+  }).catch(()=>{});
+}
+loadIslands();
+
+// ── shared cycle timeline + live countdown (all worlds refresh on the same clock) ──
+const SLOTS=[{m:7*60,l:'7am'},{m:11*60+30,l:'11:30'},{m:15*60,l:'3pm'},{m:18*60+30,l:'6:30'},{m:22*60+30,l:'10:30'}];
+function sgtNow(){ const n=new Date(); return new Date(n.getTime()+n.getTimezoneOffset()*60000+8*3600000); }
+function fmt12(mins){ let h=Math.floor(mins/60)%24,m=mins%60,ap=h>=12?'pm':'am',hh=h%12||12; return m?`${hh}:${String(m).padStart(2,'0')}${ap}`:`${hh}${ap}`; }
+let lastPillKey='', lastLiveIdx=null, refreshArmed=false;
+function tickCycle(){
+  const sgt=sgtNow(), mins=sgt.getHours()*60+sgt.getMinutes()+sgt.getSeconds()/60;
+  let liveIdx=-1; for(let i=0;i<SLOTS.length;i++){ if(mins>=SLOTS[i].m) liveIdx=i; }
+  if(liveIdx===-1) liveIdx=SLOTS.length-1;                 // before 7am → last night's chapter is live
+  let nextIdx=SLOTS.findIndex(s=>s.m>mins), nextMin;
+  if(nextIdx===-1){ nextIdx=0; nextMin=SLOTS[0].m+1440; } else nextMin=SLOTS[nextIdx].m;
+  // pills — only rebuild when the done/live pattern changes (keeps the pulse smooth)
+  const passedToday = SLOTS.map(s=>mins>=s.m);
+  const key=SLOTS.map((s,i)=> i===liveIdx&&passedToday[i] ?'L':(passedToday[i]?'D':'_')).join('');
+  if(key!==lastPillKey){ lastPillKey=key;
+    document.getElementById('cbSteps').innerHTML = SLOTS.map((s,i)=>{
+      let cls = (i===liveIdx&&passedToday[i])?'live':(passedToday[i]?'done':'');
+      return `<span class="cb-step ${cls}"><span class="cbd"></span>${s.l}</span>`;
+    }).join('<span class="cb-arr">›</span>');
+  }
+  // countdown
+  const since = passedToday[liveIdx] ? (mins-SLOTS[liveIdx].m) : 99;
+  const el=document.getElementById('cbNext'), bar=document.getElementById('cbNext').parentElement;
+  if(since>=0 && since<3){
+    bar.classList.add('posting'); el.innerHTML='✨ A new chapter is posting across all worlds…';
+  } else {
+    bar.classList.remove('posting');
+    const diff=nextMin-mins, h=Math.floor(diff/60), m=Math.floor(diff%60), sec=Math.floor((diff*60)%60);
+    const cd = h>0?`in ${h}h ${m}m` : (m>0?`in ${m}m` : `in ${sec}s`);
+    el.innerHTML=`Next chapter · ${fmt12(SLOTS[nextIdx].m)} · <b>${cd}</b>`;
+  }
+  // auto-refresh when a new cycle begins (give the cron ~100s to post, then pull fresh)
+  if(lastLiveIdx!==null && liveIdx!==lastLiveIdx && !refreshArmed){
+    refreshArmed=true;
+    setTimeout(()=>loadIslands(),100000);
+    setTimeout(()=>{ loadIslands(); refreshArmed=false; },210000);
+  }
+  lastLiveIdx=liveIdx;
+}
+tickCycle(); setInterval(tickCycle,1000);
 
 // the rise-from-sea entrance ends on clip-path:inset(0) with fill-mode:both, which keeps
 // cropping each island to its own box — and crops the pop-up status card that sits ABOVE it.
