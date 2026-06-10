@@ -306,7 +306,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0b1020;font-family:
 /* z-index:5 preserves the islands' original stacking. NOTE: do NOT put a transform on this
    wrapper — a transformed ancestor reparents the islands' absolutely-positioned status cards
    and mis-renders them. Parallax therefore moves only the sky layers, never the islands. */
-#islands-layer{position:absolute;inset:0;z-index:5}
+#islands-layer{position:absolute;inset:0;z-index:7}/* above #title/cyclebar (z6) so an open island's pop-up card isn't trapped behind it on mobile */
 
 /* shooting star (night only) */
 #shooting{position:absolute;top:14%;left:62%;width:2.4px;height:2.4px;border-radius:50%;background:#fff;
