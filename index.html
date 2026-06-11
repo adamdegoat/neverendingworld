@@ -262,7 +262,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0b1020;font-family:
   .island.live .art svg{width:128px;height:auto}
   .island.soon .art svg{width:104px;height:auto}
   #isle-alaskanboys{left:27%!important;top:54%!important}
-  #isle-bfc{left:73%!important;top:54%!important}
   #isle-drivingdead{left:23%!important;top:69%!important}
   #isle-tropicana{left:77%!important;top:69%!important}
   #isle-rimba{left:50%!important;top:83%!important}
@@ -273,7 +272,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0b1020;font-family:
   .island.live .art svg{width:116px}
   .island.soon .art svg{width:92px}
   #isle-alaskanboys{left:26%!important}
-  #isle-bfc{left:74%!important}
   #isle-drivingdead{left:24%!important}
   #isle-tropicana{left:76%!important}
 }
@@ -642,53 +640,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0b1020;font-family:
       <div class="ic-go">Enter island ›</div>
     </div>
   </a>
-  <!-- BFC (live) — the arena island -->
-  <a class="island live active" id="isle-bfc" href="https://adamdegoat.github.io/bfc/" aria-label="Enter BFC — a living fight promotion" style="left:62%;top:56%">
-    <div class="shadow"></div>
-    <div class="reflect"></div>
-    <div class="ripple"></div>
-    <div class="art"><svg width="178" height="124" viewBox="0 0 178 124">
-      <!-- spotlight beams over the arena -->
-      <path d="M89 8 L60 70 L118 70 Z" fill="#ffe6a0" opacity=".10"/>
-      <path d="M89 8 L40 64 L72 70 Z" fill="#e11d2e" opacity=".07"/>
-      <path d="M89 8 L138 64 L106 70 Z" fill="#38bdf8" opacity=".06"/>
-      <!-- stone island base -->
-      <ellipse cx="89" cy="101" rx="77" ry="22" fill="#2a2f3a"/>
-      <ellipse cx="89" cy="96" rx="66" ry="16" fill="#363c49"/>
-      <!-- arena bowl -->
-      <path d="M44 92 Q44 64 89 64 Q134 64 134 92 Z" fill="#1c2230"/>
-      <path d="M52 90 Q52 70 89 70 Q126 70 126 90 Z" fill="#11151f"/>
-      <!-- octagon cage, lit -->
-      <g transform="translate(89 80)">
-        <polygon points="-26,8 -15,-12 15,-12 26,8 15,20 -15,20" fill="#0c0f17"/>
-        <polygon points="-21,6 -12,-9 12,-9 21,6 12,15 -12,15" fill="#2b3650"/>
-        <g stroke="#9aa3b5" stroke-width="1.1" opacity=".55">
-          <line x1="-21" y1="6" x2="-21" y2="-6"/><line x1="-12" y1="-9" x2="-12" y2="-21"/>
-          <line x1="12" y1="-9" x2="12" y2="-21"/><line x1="21" y1="6" x2="21" y2="-6"/>
-          <line x1="0" y1="-9" x2="0" y2="-22"/>
-        </g>
-        <polygon points="-21,-6 -12,-21 12,-21 21,-6" fill="none" stroke="#5a6276" stroke-width="1" opacity=".4"/>
-        <text x="0" y="10" font-family="Cinzel,serif" font-weight="900" font-size="12" fill="#f5c542" text-anchor="middle" opacity=".8">BFC</text>
-      </g>
-      <!-- big screen + banner -->
-      <rect x="56" y="48" width="26" height="15" rx="2" fill="#0a2a4a" stroke="#1c3a55" stroke-width=".8"/>
-      <text x="69" y="59" font-family="Cinzel,serif" font-weight="900" font-size="8" fill="#cfe3f5" text-anchor="middle">BFC</text>
-      <rect x="96" y="48" width="26" height="15" rx="2" fill="#1b0f16" stroke="#3a1c26" stroke-width=".8"/>
-      <text x="109" y="59" font-family="Cinzel,serif" font-weight="900" font-size="8" fill="#f5c542" text-anchor="middle">100</text>
-      <!-- light flares -->
-      <circle cx="60" cy="44" r="2" fill="#fff" opacity=".8"/><circle cx="118" cy="44" r="2" fill="#fff" opacity=".8"/>
-      <circle cx="89" cy="40" r="2.4" fill="#ffe9b0" opacity=".85"/>
-    </svg><div class="rim"></div><div class="wx-layer"></div></div>
-    <div class="label">BFC</div>
-    <div class="cast-peek" id="bfc-cast"></div>
-    <div class="isle-card">
-      <div class="ic-name">BFC · Best Fighting Championship</div>
-      <div class="ic-status" id="bfc-status"><span class="ic-dot"></span><span>Loading…</span></div>
-      <div class="ic-next" id="bfc-next"><span class="tick"></span><span>next chapter soon</span></div>
-      <div class="ic-pulse" id="bfc-pulse">Fifty fighters, five divisions, one belt each — a fight promotion that never stops.</div>
-      <div class="ic-go">Enter island ›</div>
-    </div>
-  </a>
   </div><!-- /islands-layer -->
 
   <!-- compass -->
@@ -787,7 +738,7 @@ setInterval(()=>{ if(HAPPENINGS.length>1){ hapIdx=(hapIdx+1)%HAPPENINGS.length; 
 
 // ── live status driven by the islands.json registry; each live island wires its own card ──
 const CYIDX={morning:0,midday:1,afternoon:2,evening:3,night:4};
-const CARD={tropicana:'trop', rimba:'rimba', drivingdead:'dd', alaskanboys:'ak', bfc:'bfc'};   // island id -> card id prefix
+const CARD={tropicana:'trop', rimba:'rimba', drivingdead:'dd', alaskanboys:'ak'};   // island id -> card id prefix
 function wireIsland(isl, isPrimary){
   const pre=CARD[isl.id]; if(!pre || !isl.data) return Promise.resolve(0);
   const setStatus=(html)=>{ const e=document.getElementById(pre+'-status'); if(e) e.innerHTML=html; };
@@ -805,7 +756,7 @@ function wireIsland(isl, isPrimary){
   }).catch(()=>{ setStatus(`<span class="ic-dot"></span><span>Live · always running</span>`); return 0; });
   fetch(isl.data+'/characters.json?t='+Date.now()).then(r=>r.json()).then(chars=>{
     let html='';
-    Object.values(chars).slice(0,6).forEach(c=>{   // cap the peek (rosters can be large, e.g. BFC's 50)
+    Object.values(chars).slice(0,6).forEach(c=>{   // cap the peek (rosters can be large)
       if(!c || typeof c!=='object') return;
       if(c.name && c.name.trim() || c.species) html+=miniAvatar(c);
     });

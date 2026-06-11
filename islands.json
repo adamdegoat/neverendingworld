@@ -1,70 +1,57 @@
 {
-  "_comment": "Registry of Never Ending Story worlds. To light up a new world: flip its status to 'live', set url + data, then hand-craft its island SVG art in index.html to the aesthetic bar. Bespoke art stays hand-built — only the wiring/metadata lives here.",
-  "islands": [
-    {
-      "id": "tropicana",
-      "world_no": 1,
-      "name": "Tropicana",
-      "status": "live",
-      "url": "https://adamdegoat.github.io/loveisland/",
-      "data": "https://adamdegoat.github.io/loveisland/data",
-      "blurb": "A deserted island where castaways find each other.",
-      "pos": {
-        "left": "50%",
-        "top": "70%"
-      }
-    },
-    {
-      "id": "drivingdead",
-      "world_no": 2,
-      "name": "Driving Dead",
-      "status": "live",
-      "url": "https://adamdegoat.github.io/drivingdead/",
-      "data": "https://adamdegoat.github.io/drivingdead/data",
-      "blurb": "A couple in a solar camper van, dug in on a rooftop above a dead city.",
-      "pos": {
-        "left": "21%",
-        "top": "80%"
-      }
-    },
-    {
-      "id": "rimba",
-      "world_no": 3,
-      "name": "Rimba",
-      "status": "live",
-      "url": "https://adamdegoat.github.io/rimba/",
-      "data": "https://adamdegoat.github.io/rimba/data",
-      "blurb": "Two Singaporeans & a cat, stranded deep in the Malaysian jungle.",
-      "pos": {
-        "left": "79%",
-        "top": "83%"
-      }
-    },
-    {
-      "id": "alaskanboys",
-      "world_no": 4,
-      "name": "Alaskan Boys",
-      "status": "live",
-      "url": "https://adamdegoat.github.io/alaskanboys/",
-      "data": "https://adamdegoat.github.io/alaskanboys/data",
-      "blurb": "A family building an off-grid homestead in the wild Alaskan interior.",
-      "pos": {
-        "left": "38%",
-        "top": "58%"
-      }
-    },
-    {
-      "id": "bfc",
-      "world_no": 5,
-      "name": "BFC",
-      "status": "live",
-      "url": "https://adamdegoat.github.io/bfc/",
-      "data": "https://adamdegoat.github.io/bfc/data",
-      "blurb": "Fifty fighters, five divisions, one belt each — a fight promotion that never stops.",
-      "pos": {
-        "left": "62%",
-        "top": "56%"
-      }
-    }
-  ]
+    "_comment": "Registry of Never Ending Story worlds. To light up a new world: flip its status to 'live', set url + data, then hand-craft its island SVG art in index.html to the aesthetic bar. Bespoke art stays hand-built — only the wiring/metadata lives here.",
+    "islands": [
+        {
+            "id": "tropicana",
+            "world_no": 1,
+            "name": "Tropicana",
+            "status": "live",
+            "url": "https://adamdegoat.github.io/loveisland/",
+            "data": "https://adamdegoat.github.io/loveisland/data",
+            "blurb": "A deserted island where castaways find each other.",
+            "pos": {
+                "left": "50%",
+                "top": "70%"
+            }
+        },
+        {
+            "id": "drivingdead",
+            "world_no": 2,
+            "name": "Driving Dead",
+            "status": "live",
+            "url": "https://adamdegoat.github.io/drivingdead/",
+            "data": "https://adamdegoat.github.io/drivingdead/data",
+            "blurb": "A couple in a solar camper van, dug in on a rooftop above a dead city.",
+            "pos": {
+                "left": "21%",
+                "top": "80%"
+            }
+        },
+        {
+            "id": "rimba",
+            "world_no": 3,
+            "name": "Rimba",
+            "status": "live",
+            "url": "https://adamdegoat.github.io/rimba/",
+            "data": "https://adamdegoat.github.io/rimba/data",
+            "blurb": "Two Singaporeans & a cat, stranded deep in the Malaysian jungle.",
+            "pos": {
+                "left": "79%",
+                "top": "83%"
+            }
+        },
+        {
+            "id": "alaskanboys",
+            "world_no": 4,
+            "name": "Alaskan Boys",
+            "status": "live",
+            "url": "https://adamdegoat.github.io/alaskanboys/",
+            "data": "https://adamdegoat.github.io/alaskanboys/data",
+            "blurb": "A family building an off-grid homestead in the wild Alaskan interior.",
+            "pos": {
+                "left": "38%",
+                "top": "58%"
+            }
+        }
+    ]
 }
